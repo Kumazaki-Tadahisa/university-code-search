@@ -1,32 +1,72 @@
 let data = [];
+
 fetch("data.json")
-.then(res => res.json())
-.then(json => {
-data = json;
+  .then(response => response.json())
+  .then(json => {
+
+    data = json;
+
+    const universities =
+      [...new Set(data.map(x => x.name1))]
+      .sort();
+
+    const list =
+      document.getElementById("universityList");
+
+    universities.forEach(name => {
+
+      const option =
+        document.createElement("option");
+
+      option.value = name;
+
+      list.appendChild(option);
+    });
+  });
+
 document
-.getElementById("keyword")
-.addEventListener("input", search);
-});
-function search() {
-const keyword =
-document
-.getElementById("keyword")
-.value
-.trim();
-const result = data.filter(row =>
-row.name1.includes(keyword)
-);
-const tbody =
-document.getElementById("result");
-tbody.innerHTML = "";
-result.slice(0,100).forEach(row => {
-tbody.innerHTML += `
-<tr>
-<td>${row.code}</td>
-<td>${row.name1}</td>
-<td>${row.name2 || ""}</td>
-<td>${row.name3 || ""}</td>
-</tr>
-`;
-});
+  .getElementById("university")
+  .addEventListener("change", showResult);
+
+function showResult() {
+
+  const university =
+    document.getElementById("university").value;
+
+  const result =
+    data.filter(x => x.name1 === university);
+
+  const div =
+    document.getElementById("result");
+
+  if(result.length === 0){
+    div.innerHTML = "該当なし";
+    return;
+  }
+
+  let html = `
+    <table>
+      <tr>
+        <th>コード</th>
+        <th>学校名</th>
+        <th>学部</th>
+        <th>学科・コース</th>
+      </tr>
+  `;
+
+  result.forEach(row => {
+
+    html += `
+      <tr>
+        <td>${row.code}</td>
+        <td>${row.name1}</td>
+        <td>${row.name2 || ""}</td>
+        <td>${row.name3 || ""}</td>
+      </tr>
+    `;
+  });
+
+  html += "</table>";
+
+  div.innerHTML = html;
 }
